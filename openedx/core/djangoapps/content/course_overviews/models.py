@@ -10,6 +10,8 @@ from django.utils.translation import ugettext
 
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
+from xmodule.course_module import CourseDescriptor
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
@@ -114,10 +116,17 @@ class CourseOverview(django.db.models.Model):
         future use.
 
         Arguments:
-            course_id (CourseKey): the ID of the course overview to be loaded
+            course_id (CourseKey): the ID of the course overview to be loaded.
 
         Returns:
-            CourseOverview: overview of the requested course
+            CourseOverview: overview of the requested course. If loading course
+            from the module store failed, returns None.
+
+        Raises:
+            - CourseOverview.DoesNotExist if the course specified by course_id
+                was not found.
+            - IOError if some other error occurs while trying to load the
+                course from the module store.
         """
         course_overview = None
         try:
@@ -126,9 +135,17 @@ class CourseOverview(django.db.models.Model):
             store = modulestore()
             with store.bulk_operations(course_id):
                 course = store.get_course(course_id)
-                if course:
+                if isinstance(course, CourseDescriptor):
                     course_overview = CourseOverview._create_from_course(course)
-                    course_overview.save()  # Save new overview to the cache
+                    course_overview.save()
+                elif course is not None:
+                    raise IOError(
+                        "Error while loading course {} from the module store: {}",
+                        unicode(course_id),
+                        course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                    )
+                else:
+                    raise CourseOverview.DoesNotExist()
         return course_overview
 
     def clean_id(self, padding_char='='):
