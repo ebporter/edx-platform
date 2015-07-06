@@ -34,7 +34,7 @@
         </div>
     % elif credit_status["request_status"] in [None, "pending"]:
         <p class="message-copy credit-request-pending-msg">
-        ${_("Thank you. Your credit is processing. Please see {provider_link} for more information..").format(
+        ${_("Thank you. Your credit is processing. Please see {provider_link} for more information.").format(
                 provider_link=u'<a href="{provider_url}">{provider_name}</a>'.format(
                     provider_url=credit_status["provider_status_url"],
                     provider_name=credit_status["provider_name"],
@@ -50,7 +50,7 @@
         <a class="btn credit-btn" href="${credit_status['provider_status_url']}" target="_blank">${_("Access credit")}</a>
     % elif credit_status["request_status"] == "rejected":
         <p class="message-copy credit-request-rejected-msg">
-        ${_("Your credit has been processed but denied. Please contact {provider_name} for more information..").format(
+        ${_("Your credit has been processed but denied. Please contact {provider_name} for more information.").format(
                 provider_name=credit_status["provider_name"],
             )
         }
