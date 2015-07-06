@@ -106,7 +106,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         response = self._load_dashboard()
         self.assertContains(response, "credit-eligibility-msg")
         self.assertContains(response, "purchase-credit-btn")
-        self.assertContains(response, "purchase credit for this course expires")
+        self.assertContains(response, "Don't miss out!")
 
     def test_purchased_credit(self):
         # Simulate that the user has purchased credit, but has not
